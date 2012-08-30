@@ -14,15 +14,30 @@
    (def __
 
       (fn [s]
-        (loop [a (first s) r (rest s)]
-          (if 
-
-
+       (letfn [(flatten? [s]
+          (or (seq? s) (vector? s)))]
+        (loop [f (first s) r (rest s) x '()]
+          (println f "--" r "--" x)
+          (if (and (not (flatten? f)) (empty? r)) (reverse (cons f x))
+            (if (not (flatten? f))
+              (recur (first r) (rest r) (cons f x))
+              (recur (first f) (if (empty? (rest f)) r (cons (rest f) r)) x)))))
       )
 
    )
 
+    ; 计算第一个
+    (println
+      ((fn [s]
+        (loop [f (first s)]
+          (if (seq? f)
+            (recur (first f))
+            f)))
+        '((((1))))
+      ))
 
+
+   (is (= (__ '((1 2) 3 (4 (5 6)))) '(1 2 3 4 5 6)))
    (is (= (__ '((1 2) 3 [4 [5 6]])) '(1 2 3 4 5 6)))
    (is (= (__ ["a" ["b"] "c"]) '("a" "b" "c")))
    (is (= (__ '((((:a))))) '(:a)))
